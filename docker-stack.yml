@@ -58,6 +58,8 @@ services:
                   
   admin:
     image: alexmarin88/proiect-cc:admin
+    ports:
+      - "4444:4444"
     hostname: admin
     networks:
       - dbconnect
@@ -67,6 +69,8 @@ services:
     
   client:
     image: alexmarin88/proiect-cc:client
+    ports:
+      - "7777:7777"
     hostname: client
     networks:
       - backend
