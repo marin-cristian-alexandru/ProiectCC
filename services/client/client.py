@@ -18,6 +18,8 @@ def sell_player():
     URL = "http://server:5000/sell_player?player_name=" + player_name + "&age=" + age + \
           "&ttype=" + ttype + "&value=" + value + "&contract_l=" + contract_l + \
           "&price=" + price + "&actual_team=" + actual_team
+          
+    # do the request and wait for the response
     response = requests.get(URL)
     response_msg = response.json()
 

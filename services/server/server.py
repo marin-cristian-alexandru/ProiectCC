@@ -19,7 +19,6 @@ def add_in_db(addable_dict, ttype):
     r = cliIDB.write_points(points, time_precision='s', consistency='all')
     return r
 
-
 # before listening to Flask requests, the server should create the influx DB
 cliIDB = InfluxDBClient(host='influxdb', port=8086)
 
