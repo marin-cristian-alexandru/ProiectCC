@@ -1,95 +1,90 @@
 import requests  # for sending the request
+from flask import request, jsonify, Flask
 
-
-def sell_player():
-    player_name = input("Introduceti numele jucatorului pe care doriti sa-l vindeti: ")
-    age = int(input("Introduceti varsta jucatorului listat pentru vanzare: "))
-    ttype = "transfer_listed"
-    value = int(input("Valoarea actuala (in milioane de euro) a jucatorului conform FIFA: "))
-    contract_l = int(input("Introduceti cati ani de contract mai are jucatorul la clubul dumneavoastra: "))
-    price = int(input("Suma de bani (in milioane de euro) pe care o doriti pentru a primi o oferta: "))
-    actual_team = log_team_name
-
-    URL = "http://server:5000/sell_player?player_name=" + player_name + "&age=" + str(age) + \
-          "&ttype=" + ttype + "&value=" + str(value) + "&contract_l=" + str(contract_l) + \
-          "&price=" + str(price) + "&actual_team=" + actual_team
-    response = requests.get(URL)
-    response_msg = response.json()
-
-    if response_msg == "":
-        print("\nTransferul dumneavoastra nu a putut fi inregistrat!\n")
-    else:
-        print(response_msg)
-
-
-def buy_player():
-    player_name = input("Introduceti numele jucatorului pe care doriti sa-l cumparati: ")
-    age = int(input("Introduceti varsta jucatorului de interes: "))
-    actual_team = input("Introduceti echipa la care este legitimat jucatorul in prezent: ")
-    ttype = input("Tipul tranferului realizat: rumour (doar o oferta) / confirmed (deja v-ati inteles cu clubul): ")
-    value = int(input("Valoarea actuala (in milioane de euro) a jucatorului conform FIFA: "))
-    wage = int(input("Introduceti salariul oferit jucatorului(in mii de euro pe saptamana): "))
-    contract_l = int(input("Introduceti cati ani de contract oferiti jucatorului: "))
-    price = int(input("Suma de bani (in milioane de euro) pe care o oferiti: "))
-    new_team = log_team_name  # bring the player to this team
-
-    URL = "http://server:5000/buy_player?player_name=" + player_name + "&age=" + str(age) + \
-          "&ttype=" + ttype + "&value=" + str(value) + "&wage=" + str(wage) + "&contract_l=" + str(contract_l) + \
-          "&price=" + str(price) + "&actual_team=" + actual_team + "&new_team=" + new_team
-
-    # do the request and wait for the response
-    response = requests.get(URL)
-    response_msg = response.json()
-
-    if response_msg == "":
-        print("\nTransferul dumneavoastra nu a putut fi inregistrat!\n")
-    else:
-        print(response_msg)
-
-
-def loan_player():
-    player_name = input("Introduceti numele jucatorului pe care doriti sa-l imprumutati: ")
-    age = int(input("Introduceti varsta jucatorului de interes: "))
-    actual_team = input("Introduceti echipa la care este legitimat jucatorul in prezent: ")
-    ttype = "loaned"
-    value = int(input("Valoarea actuala (in milioane de euro) a jucatorului conform FIFA: "))
-    wage_percent = int(input("Introduceti numarul de procente din salariul jucatorului pe care il veti oferi: "))
-    contract_l = int(input("Introduceti cati ani de contract oferiti jucatorului(1/2): "))
-    new_team = log_team_name  # bring the player to this team
-
-    URL = "http://server:5000/loan_player?player_name=" + player_name + "&age=" + str(age) + \
-          "&ttype=" + ttype + "&value=" + str(value) + "&wage_percent=" + str(wage_percent) + \
-          "&contract_l=" + str(contract_l) + "&actual_team=" + actual_team + "&new_team=" + new_team
-
-    # do the request and wait for the response
-    response = requests.get(URL)
-    response_msg = response.json()
-
-    if response_msg == "":
-        print("\nTransferul dumneavoastra nu a putut fi inregistrat!\n")
-    else:
-        print(response_msg)
-
-
-# mapping of client operations
-clientOperations = {1: sell_player, 2: buy_player, 3: loan_player}
 
 print("Acesta este un client pentru serviciul TransfermarkT")
+app = Flask(__name__)
 
-log_team_name = input("\nCe club de fotbal reprezentati?\n")
-print("Bine ati venit, %s! Ce transfer doriti sa raportati?" % log_team_name)
+@app.route("/sell_player", methods=['POST'])
+def sell_player():
+    player_name = request.json['player_name']
+    age = request.json['age']
+    ttype = "transfer_listed"
+    value = request.json['value']
+    contract_l = request.json['contract_l']
+    price = request.json['price']
+    actual_team = request.json['actual_team']
 
-while (True):
+    URL = "http://server:5000/sell_player?player_name=" + player_name + "&age=" + age + \
+          "&ttype=" + ttype + "&value=" + value + "&contract_l=" + contract_l + \
+          "&price=" + price + "&actual_team=" + actual_team
+    response = requests.get(URL)
+    response_msg = response.json()
 
-    input_code = int(input("\nIntroduceti unul din urmatoarele coduri pentru operatia pe care o doriti:\n"
-                           "0 - iesire interfata de client\n"
-                           "1 - vanzare jucator\n"
-                           "2 - achizitie jucator\n"
-                           "3 - imprumut jucator\n"))
-    if input_code == 0:
-        break
+    if response_msg == "":
+        response_f = "Transferul dumneavoastra nu a putut fi inregistrat!\n"
     else:
-        clientOperations[input_code]()
+        response_f = response_msg
+
+    return jsonify(response_f), 200
+
+
+@app.route("/buy_player", methods=['POST'])
+def buy_player():
+    player_name = request.json['player_name']
+    age = request.json['age']
+    actual_team = request.json['actual_team']
+    ttype = request.json['ttype']
+    value = request.json['value']
+    wage = request.json['wage']
+    contract_l = request.json['contract_l']
+    price = request.json['price']
+    new_team = request.json['new_team']
+
+    URL = "http://server:5000/buy_player?player_name=" + player_name + "&age=" + age + \
+          "&ttype=" + ttype + "&value=" + value + "&wage=" + wage + "&contract_l=" + contract_l + \
+          "&price=" + price + "&actual_team=" + actual_team + "&new_team=" + new_team
+
+    # do the request and wait for the response
+    response = requests.get(URL)
+    response_msg = response.json()
+
+    if response_msg == "":
+        response_f = "Transferul dumneavoastra nu a putut fi inregistrat!\n"
+    else:
+        response_f = response_msg
+
+    return jsonify(response_f), 200
+
+
+@app.route("/loan_player", methods=['POST'])
+def loan_player():
+    player_name = request.json['player_name']
+    age = request.json['age']
+    actual_team = request.json['actual_team']
+    ttype = "loaned"
+    value = request.json['value']
+    wage_percent = request.json['wage_percent']
+    contract_l = request.json['contract_l']
+    new_team = request.json['new_team']
+
+    URL = "http://server:5000/loan_player?player_name=" + player_name + "&age=" + age + \
+          "&ttype=" + ttype + "&value=" + value + "&wage_percent=" + wage_percent + \
+          "&contract_l=" + contract_l + "&actual_team=" + actual_team + "&new_team=" + new_team
+
+    # do the request and wait for the response
+    response = requests.get(URL)
+    response_msg = response.json()
+
+    if response_msg == "":
+        response_f = "Transferul dumneavoastra nu a putut fi inregistrat!\n"
+    else:
+        response_f = response_msg
+
+    return jsonify(response_f), 200
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=7777)
 
 print("Multumim ca ati folosit serviciul TransfermarkT pentru a va actualiza situatia sportivilor!\n")
 
