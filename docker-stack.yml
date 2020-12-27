@@ -10,7 +10,7 @@ services:
       - dbconnect
       - front
     environment:
-      INFLUX_ROOT_PASSWORD: proiectidp
+      INFLUX_ROOT_PASSWORD: proiectcc
       INFLUX_DATABASE: TransfermarkT
     deploy:
       placement:
@@ -29,9 +29,9 @@ services:
     environment:
       GRAFANA_DB_HOST: influxdb:8086
       GRAFANA_USERNAME: alexmarin
-      GRAFANA_PASSWORD: proiectidp
+      GRAFANA_PASSWORD: proiectcc
       GRAFANA_DB_NAME: grafana_db
-      GF_SECURITY_ADMIN_PASSWORD: proiectidp
+      GF_SECURITY_ADMIN_PASSWORD: proiectcc
     ports:
       - "3000:3000"
     volumes:
@@ -42,7 +42,7 @@ services:
           - node.labels.grafana == true
           
   server:
-    image: alexmarin88/idp_project:server
+    image: alexmarin88/proiect-cc:server
     ports:
       - "5000:5000"
     hostname: server
@@ -57,7 +57,7 @@ services:
       - influxdb
                   
   admin:
-    image: alexmarin88/idp_project:admin
+    image: alexmarin88/proiect-cc:admin
     hostname: admin
     networks:
       - dbconnect
@@ -66,7 +66,7 @@ services:
       - server
     
   client:
-    image: alexmarin88/idp_project:client
+    image: alexmarin88/proiect-cc:client
     hostname: client
     networks:
       - backend
