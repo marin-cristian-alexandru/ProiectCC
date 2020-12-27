@@ -1,0 +1,79 @@
+Build si run imagine custom (dockerfile)
+
+docker build -t server .
+docker run -ti --net host server
+
+Stergere containere:
+docker rm $(docker ps -a -f status=exited -q)
+
+-verificare: docker container ls -a
+
+Am doar 3 imagini pe local: python, grafana si influxdb
+
+Pt build local:
+docker build -t server .
+docker build -t client .
+docker build -t dbadmin .
+
+IMAGINI:
+
+REPOSITORY        TAG       IMAGE ID        CREATED           SIZE
+server            latest    5d2b0a4ad240    15 seconds ago    930MB
+client            latest    9978d372bc05    18 seconds ago    922MB
+grafana/grafana   latest    8d9380d6a636    3 hours ago       233MB
+influxdb          latest    21a67fb7b0ff    3 weeks ago       311MB
+python            3.6       1daf62e8cab5    3 weeks ago       914MB
+
+Build imagini DockerHUB + Pornesc containerele local:
+
+1) baza de date
+docker run -p 8086:8086 -v $PWD:/var/lib/influxdb influxdb
+
+2)serverul
+docker pull alexmarin88/idp_project:server
+docker run -ti --net host alexmarin88/idp_project:server
+
+3)clientul
+docker pull alexmarin88/idp_project:client
+docker run -ti --net host alexmarin88/idp_project:client
+
+4)adminul
+docker pull alexmarin88/idp_project:admin
+docker run -ti --net host alexmarin88/idp_project:admin
+
+DOCKER SWARM
+docker-machine (tutorial)
+-create node1, node2
+node1 master-> init
+
+//add grafana to swarm
+docker node update --label-add grafana=true q1jto5em36mady0mfdbc98wkn
+
+//add influxdb to swarm
+docker node update --label-add influxdb=true q1jto5em36mady0mfdbc98wkn
+
+Deploy stack:
+docker stack deploy -c docker-stack.yml tmkt
+
+
+Grafana:
+-acces la ip master:3000 (admin:proiectidp)
+cand configurezi influx (ip http://ipmaster:8086; browser; TransfermarkT)
+
+
+Pornire separata client si admin pe swarm:
+sudo docker container run -ti --net tmkt_backend alexmarin88/idp_project:client (unde tmkt este stack-ul de servicii)
+
+!optional!sudo docker container run -ti --net tmkt_drmbconnect alexmarin88/idp_project:server
+
+sudo docker container run -ti --net tmkt_dbconnect alexmarin88/idp_project:admin (unde tmkt este stack-ul de servicii)
+
+
+
+Pt Bonus: Doua instante de EC2:
+(doar la prezentare intrucat masinile stau pe stop ca sa nu consume si vor fi pornite doar atunci)
+(dns-ul difera dupa adresa publica diferita la fiecare pornire de containere)
+Username instante ssh putty: ubuntu
+-instalare docker
+-creare swarm doua noduri + !!add labels on master for grafana and influxdb
+

@@ -1,0 +1,88 @@
+version: '3.3'
+
+services:
+  influxdb:
+    image: influxdb:latest
+    volumes:
+        - db_data:/var/lib/influxdb
+    hostname: influxdb
+    networks:
+      - dbconnect
+      - front
+    environment:
+      INFLUX_ROOT_PASSWORD: proiectidp
+      INFLUX_DATABASE: TransfermarkT
+    deploy:
+      placement:
+        constraints:
+          - node.labels.influxdb == true
+    ports:
+      - "8086:8086"
+      
+  grafana:
+    image: grafana/grafana
+    depends_on:
+      - influxdb
+    hostname: grafana
+    networks:
+      - front
+    environment:
+      GRAFANA_DB_HOST: influxdb:8086
+      GRAFANA_USERNAME: alexmarin
+      GRAFANA_PASSWORD: proiectidp
+      GRAFANA_DB_NAME: grafana_db
+      GF_SECURITY_ADMIN_PASSWORD: proiectidp
+    ports:
+      - "3000:3000"
+    volumes:
+      - grf_data:/var/lib/grafana
+    deploy:
+      placement:
+        constraints:
+          - node.labels.grafana == true
+          
+  server:
+    image: alexmarin88/idp_project:server
+    ports:
+      - "5000:5000"
+    hostname: server
+    networks:
+      - backend
+      - dbconnect
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    depends_on:
+      - influxdb
+                  
+  admin:
+    image: alexmarin88/idp_project:admin
+    hostname: admin
+    networks:
+      - dbconnect
+    depends_on:
+      - influxdb
+      - server
+    
+  client:
+    image: alexmarin88/idp_project:client
+    hostname: client
+    networks:
+      - backend
+    depends_on:
+      - server
+    
+networks:
+  front:
+    driver: overlay
+  backend:
+    driver: overlay
+    attachable: true
+  dbconnect:
+    driver: overlay
+    attachable: true
+
+volumes:
+    db_data: {}
+    grf_data: {}
