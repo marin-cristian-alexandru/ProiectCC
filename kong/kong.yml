@@ -4,8 +4,8 @@ services:
 
   - name: client
     url: http://tmkt_client:7777
-    plugins:
-      - name: key-auth
+    # plugins:
+    #   - name: key-auth
     routes:
       - name: client-route
         paths: 
@@ -13,19 +13,20 @@ services:
           
   - name: admin
     url: http://tmkt_admin:4444
-    plugins:
-      - name: key-auth
+    # plugins:
+    #   - name: key-auth
     routes:
       - name: admin-route
         paths:
           - /admin
 
-consumers:
-  - username: client
-    keyauth_credentials:
-      - key: clientkey
-  - username: admin
-    keyauth_credentials:
-      - key: adminkey
+# DOAR UN PLUGIN DE AUTORIZARE DIN POSTMAN, NU STERGE, DAR E DIFERIT DE AUTORIZATION SERVICE = CE TREBUIE SA FACEM NOI
+# consumers:
+#   - username: client #add field in postman request with "apikey" + "clientkey"
+#     keyauth_credentials:
+#       - key: clientkey
+#   - username: admin
+#     keyauth_credentials:
+#       - key: adminkey
 
         

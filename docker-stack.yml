@@ -16,8 +16,8 @@ services:
       placement:
         constraints:
           - node.labels.influxdb == true
-    # ports:
-    #   - "8086:8086"
+    ports:
+      - "8086:8086"
       
   grafana:
     image: grafana/grafana
