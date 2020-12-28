@@ -58,24 +58,43 @@ services:
                   
   admin:
     image: alexmarin88/proiect-cc:admin
-    ports:
-      - "4444:4444"
     hostname: admin
     networks:
       - dbconnect
+      - apigw
     depends_on:
       - influxdb
       - server
     
   client:
     image: alexmarin88/proiect-cc:client
-    ports:
-      - "7777:7777"
     hostname: client
     networks:
       - backend
+      - apigw
     depends_on:
       - server
+
+  kong:
+    image: kong:latest
+    volumes:
+      - ./kong:/usr/local/kong/declarative
+    environment:
+      KONG_DATABASE: 'off'
+      KONG_DECLARATIVE_CONFIG: /usr/local/kong/declarative/kong.yml 
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001, 0.0.0.0:8444 ssl
+    ports:
+      - 80:8000
+      - 443:8443
+    deploy:
+      placement:
+        constraints: [node.role == manager] 
+    networks:
+      - apigw
     
 networks:
   front:
@@ -86,6 +105,7 @@ networks:
   dbconnect:
     driver: overlay
     attachable: true
+  apigw:
 
 volumes:
     db_data: {}

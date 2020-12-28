@@ -1,0 +1,29 @@
+_format_version: "2.1"
+
+services:
+
+  - name: client
+    url: http://tmkt_client:7777
+    # plugins:
+    #   - name: key-auth
+    routes:
+      - name: client-route
+        paths: 
+          - /client
+          
+  - name: admin
+    url: http://tmkt_admin:4444
+    routes:
+      - name: admin-route
+        paths:
+          - /admin
+
+# consumers:
+#   - username: client
+#     keyauth_credentials:
+#       - key: clientkey
+#   - username: admin
+#     keyauth_credentials:
+#       - key: adminkey
+
+        
