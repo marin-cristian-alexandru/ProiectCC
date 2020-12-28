@@ -26,6 +26,7 @@ services:
     hostname: grafana
     networks:
       - front
+      - apigw
     environment:
       GRAFANA_DB_HOST: influxdb:8086
       GRAFANA_USERNAME: alexmarin
@@ -43,8 +44,6 @@ services:
           
   server:
     image: alexmarin88/proiect-cc:server
-    # ports:
-    #   - "5000:5000"
     hostname: server
     networks:
       - backend
