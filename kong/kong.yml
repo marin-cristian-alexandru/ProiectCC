@@ -4,8 +4,8 @@ services:
 
   - name: client
     url: http://tmkt_client:7777
-    # plugins:
-    #   - name: key-auth
+    plugins:
+      - name: key-auth
     routes:
       - name: client-route
         paths: 
@@ -13,24 +13,19 @@ services:
           
   - name: admin
     url: http://tmkt_admin:4444
+    plugins:
+      - name: key-auth
     routes:
       - name: admin-route
         paths:
           - /admin
 
-  - name: grafana
-    url: http://tmkt_grafana:3000
-    routes:
-      - name: grafana-route
-        paths:
-          - /grafana
-
-# consumers:
-#   - username: client
-#     keyauth_credentials:
-#       - key: clientkey
-#   - username: admin
-#     keyauth_credentials:
-#       - key: adminkey
+consumers:
+  - username: client
+    keyauth_credentials:
+      - key: clientkey
+  - username: admin
+    keyauth_credentials:
+      - key: adminkey
 
         

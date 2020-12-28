@@ -26,15 +26,14 @@ services:
     hostname: grafana
     networks:
       - front
-      - apigw
     environment:
       GRAFANA_DB_HOST: influxdb:8086
       GRAFANA_USERNAME: alexmarin
       GRAFANA_PASSWORD: proiectcc
       GRAFANA_DB_NAME: grafana_db
       GF_SECURITY_ADMIN_PASSWORD: proiectcc
-    # ports:
-    #   - "3000:3000"
+    ports:
+      - "3000:3000"
     volumes:
       - grf_data:/var/lib/grafana
     deploy:
