@@ -18,6 +18,13 @@ services:
         paths:
           - /admin
 
+  - name: grafana
+    url: http://tmkt_grafana:3000
+    routes:
+      - name: grafana-route
+        paths:
+          - /grafana
+
 # consumers:
 #   - username: client
 #     keyauth_credentials:

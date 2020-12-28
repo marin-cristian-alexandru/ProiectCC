@@ -16,8 +16,8 @@ services:
       placement:
         constraints:
           - node.labels.influxdb == true
-    ports:
-      - "8086:8086"
+    # ports:
+    #   - "8086:8086"
       
   grafana:
     image: grafana/grafana
@@ -32,8 +32,8 @@ services:
       GRAFANA_PASSWORD: proiectcc
       GRAFANA_DB_NAME: grafana_db
       GF_SECURITY_ADMIN_PASSWORD: proiectcc
-    ports:
-      - "3000:3000"
+    # ports:
+    #   - "3000:3000"
     volumes:
       - grf_data:/var/lib/grafana
     deploy:
@@ -43,8 +43,8 @@ services:
           
   server:
     image: alexmarin88/proiect-cc:server
-    ports:
-      - "5000:5000"
+    # ports:
+    #   - "5000:5000"
     hostname: server
     networks:
       - backend
