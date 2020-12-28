@@ -1,3 +1,68 @@
+		==========STEPS_PROIECT_CC:==========
+
+-ACCES PLAY-WITH-DOCKER
+
+-Se creeaza 3 instante noi
+Pe unul din noduri (e.g. node1) se initiaza docker swarm-ul.
+$ docker swarm init --advertise-addr eth0
+
+Se da comanda pt workeri pe celelalte doua noduri:
+$ docker swarm join --token SWMTKN-1-0pb0x....
+
+Pentru a vedea swarmul
+$ docker node ls
+
+Mai departe pe nodul master se descarca arhiva de pe github
+$ wget https://github.com/marin-cristian-alexandru/ProiectCC/archive/main.zip
+
+Se dezarhiveaza si se intra in directorul cu fisierul yml.
+
+Inainte de a se deploya stakul, trebuie date doua labeluri de constrangere pentru doua dintre servicii 
+(consistenta partajata a volumelor pe play-with-docker)
+//add grafana to swarm
+docker node update --label-add grafana=true <id_nod_master>
+
+<id_nod_master> - se ia din docker node ls
+//add influxdb to swarm
+docker node update --label-add influxdb=true q1jto5em36mady0mfdbc98wkn
+
+Se deployaza stack-ul !!!!nume obligatoriu tmkt (transfermaerket prescurtat)
+$ docker stack deploy -c docker-stack.yml tmkt
+
+Se verifica cu $docker service ls pana cand toate serviciile au cate o replica deployata si activa (1/1)
+
+In continuare aplicatia trebuie testata:
+-pentru grafana: 
+	Se acceseaza linkul din spatele portului 3000 deschis si se autentifica folosind credentialele admin:proiectcc
+	Se adauga un data source(se leaga la baza de date cu jucatori de fotbal)
+	Din meniu se alege de la setari data sources, se selecteaza ca si baza de date influxdb si se lasa totul default mai putin
+	urmatoarele campuri: HTTP Access se schimba din Server in Browser, url se pune likul din spatele portului 8086 de pe PlayWDocker
+	(daca se copiaza linkul, atentie, se sterge ultimul /, trebuie sa fie doar un url simplu fara o cale), iar la InfluxDB Details 
+	la database se pune TransfermarkT care este numele tabelei cu jucatori din baza de date. Se da save&test si grafana e gata de configurare
+	Mai departe se afiseaza datele doar dupa ce sunt valori adaugate in baza de date:
+	Se intra in Create Dashboard, Add new panel, si se creeaza o afisare simpla, tabelara cu toate atributele jucatorilor:
+	In query, la select measurement se alege player_transfer, se da remove la mean(), la fill(null) si la time(interval),
+	de la visualization se alege Table(OPTIUNI DIN DREAPTA), apoi inapoi in query se alege format as Table si la field se pune field(*)
+	Se salveaza dashboardul si poate fi vizualizat ulterior.
+
+Atat clientul cat si adminul sunt legate la apigw cu kong si pentru a putea accesa calea catre un endpoint al 
+acestora se va adauga entry-pointul specific fiecaruia
+-pentru client:
+	Operatiile posibile sunt cereri POST. La URL se pune linkul din spatele portului 80 (sau 443) expus de apigw kong, apoi /client specific si apoi unul din
+	cele 3 endpointuri valabile: /sell_player, /buy_player, /loan_player
+	eg. http://ip172-18-0-118-bvkr6t2b914g00a4ltc0-80.direct.labs.play-with-docker.com/client/sell_player
+	
+	Pentru un body corect, in Postman se aleg Body, raw, JSON cu urmatorul text : {"player_name": "Bukayo Saka", "age": "20", "value": "50", "contract_l": "3", "price": "70", "actual_team": "Arsenal"}
+	Acesta este un exemplu de adaugat un jucator in baza de date.
+
+-pentru admin:
+	Operatiile posibile sunt cereri GET. La URL se pune linkul din spatele portului 80 (sau 443) expus de apigw kong, apoi /admin specific si apoi unul din
+	cele 4 endpointuri valabile: /show_type?ttype=transfer_listed cu tipul de transferuri pe care sa il afiseze, 
+	/delete_type?ttype=confirmed cu tipul de date care sa fie sters, /show_database si /drop_transfers
+	eg. http://ip172-18-0-118-bvkr6t2b914g00a4ltc0-80.direct.labs.play-with-docker.com/admin/show_type?ttype=transfer_listed
+	
+
+ALTE COMENZI DACA SE FACE DEPLOY PE LOCAL: 
 Build si run imagine custom (dockerfile)
 
 docker build -t server .
@@ -8,72 +73,4 @@ docker rm $(docker ps -a -f status=exited -q)
 
 -verificare: docker container ls -a
 
-Am doar 3 imagini pe local: python, grafana si influxdb
-
-Pt build local:
-docker build -t server .
-docker build -t client .
-docker build -t dbadmin .
-
-IMAGINI:
-
-REPOSITORY        TAG       IMAGE ID        CREATED           SIZE
-server            latest    5d2b0a4ad240    15 seconds ago    930MB
-client            latest    9978d372bc05    18 seconds ago    922MB
-grafana/grafana   latest    8d9380d6a636    3 hours ago       233MB
-influxdb          latest    21a67fb7b0ff    3 weeks ago       311MB
-python            3.6       1daf62e8cab5    3 weeks ago       914MB
-
-Build imagini DockerHUB + Pornesc containerele local:
-
-1) baza de date
-docker run -p 8086:8086 -v $PWD:/var/lib/influxdb influxdb
-
-2)serverul
-docker pull alexmarin88/idp_project:server
-docker run -ti --net host alexmarin88/idp_project:server
-
-3)clientul
-docker pull alexmarin88/idp_project:client
-docker run -ti --net host alexmarin88/idp_project:client
-
-4)adminul
-docker pull alexmarin88/idp_project:admin
-docker run -ti --net host alexmarin88/idp_project:admin
-
-DOCKER SWARM
-docker-machine (tutorial)
--create node1, node2
-node1 master-> init
-
-//add grafana to swarm
-docker node update --label-add grafana=true q1jto5em36mady0mfdbc98wkn
-
-//add influxdb to swarm
-docker node update --label-add influxdb=true q1jto5em36mady0mfdbc98wkn
-
-Deploy stack:
-docker stack deploy -c docker-stack.yml tmkt
-
-
-Grafana:
--acces la ip master:3000 (admin:proiectidp)
-cand configurezi influx (ip http://ipmaster:8086; browser; TransfermarkT)
-
-
-Pornire separata client si admin pe swarm:
-sudo docker container run -ti --net tmkt_backend alexmarin88/idp_project:client (unde tmkt este stack-ul de servicii)
-
-!optional!sudo docker container run -ti --net tmkt_drmbconnect alexmarin88/idp_project:server
-
-sudo docker container run -ti --net tmkt_dbconnect alexmarin88/idp_project:admin (unde tmkt este stack-ul de servicii)
-
-
-
-Pt Bonus: Doua instante de EC2:
-(doar la prezentare intrucat masinile stau pe stop ca sa nu consume si vor fi pornite doar atunci)
-(dns-ul difera dupa adresa publica diferita la fiecare pornire de containere)
-Username instante ssh putty: ubuntu
--instalare docker
--creare swarm doua noduri + !!add labels on master for grafana and influxdb
 
