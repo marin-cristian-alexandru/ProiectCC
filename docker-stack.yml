@@ -93,7 +93,45 @@ services:
         constraints: [node.role == manager] 
     networks:
       - apigw
-    
+
+  auth:
+    image: ioanamoraru14/proiect-cc:auth
+    command: gunicorn app:app -b 0.0.0.0:5000 --reload
+    volumes:
+      - ./services/auth:/app
+    links:
+      - db
+    ports:
+      - "5000:5000"
+    networks:
+      - apigw
+
+  db:
+    container_name: db
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - ./database:/docker-entrypoint-initdb.d/:ro
+      - proiect-db:/var/lib/mysql
+    networks:
+      - database-admin
+      - apigw
+      - backend
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - 7000:80
+    links:
+      - db:db
+    environment:
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: root
+    networks:
+      - database-admin
+
 networks:
   front:
     driver: overlay
@@ -104,7 +142,9 @@ networks:
     driver: overlay
     attachable: true
   apigw:
+  database-admin:
 
 volumes:
     db_data: {}
     grf_data: {}
+    proiect-db:

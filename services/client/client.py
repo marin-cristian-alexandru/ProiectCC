@@ -1,11 +1,15 @@
 import requests  # for sending the request
 from flask import request, jsonify, Flask
+from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
 
 
 print("Acesta este un client pentru serviciul TransfermarkT")
 app = Flask(__name__)
+app.config['JWT_SECRET_KEY'] = 'Super_Secret_JWT_KEY'
+jwt = JWTManager(app)
 
 @app.route("/sell_player", methods=['POST'])
+@jwt_required
 def sell_player():
     player_name = request.json['player_name']
     age = request.json['age']
