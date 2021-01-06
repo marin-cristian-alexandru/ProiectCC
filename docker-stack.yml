@@ -96,13 +96,11 @@ services:
 
   auth:
     image: ioanamoraru14/proiect-cc:auth
-    command: gunicorn app:app -b 0.0.0.0:5000 --reload
+    command: gunicorn app:app -b 0.0.0.0:8000 --reload
     volumes:
       - ./services/auth:/app
     links:
       - db
-    ports:
-      - "8000:8000"
     networks:
       - apigw
 
