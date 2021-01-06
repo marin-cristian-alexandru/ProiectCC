@@ -62,4 +62,4 @@ def protected():
     return jsonify(logged_in_as=current_user), 200
 
 if __name__ == '__main__':
-    app.run(port=8000)
+    app.run(port=8014)

@@ -21,7 +21,7 @@ services:
           - /admin
 
   - name: auth
-  url: http://tmkt_auth:8000
+  url: http://tmkt_auth:8014
   # plugins:
   #   - name: key-auth
   routes:
