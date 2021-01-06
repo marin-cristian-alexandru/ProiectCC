@@ -20,6 +20,15 @@ services:
         paths:
           - /admin
 
+  - name: auth
+  url: http://tmkt_auth:8000
+  # plugins:
+  #   - name: key-auth
+  routes:
+    - name: auth-route
+      paths: 
+        - /auth
+
 # DOAR UN PLUGIN DE AUTORIZARE DIN POSTMAN, NU STERGE, DAR E DIFERIT DE AUTORIZATION SERVICE = CE TREBUIE SA FACEM NOI
 # consumers:
 #   - username: client #add field in postman request with "apikey" + "clientkey"
