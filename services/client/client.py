@@ -36,6 +36,7 @@ def sell_player():
 
 
 @app.route("/buy_player", methods=['POST'])
+@jwt_required
 def buy_player():
     player_name = request.json['player_name']
     age = request.json['age']
@@ -64,6 +65,7 @@ def buy_player():
 
 
 @app.route("/loan_player", methods=['POST'])
+@jwt_required
 def loan_player():
     player_name = request.json['player_name']
     age = request.json['age']

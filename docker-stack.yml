@@ -65,7 +65,7 @@ services:
       - server
     
   client:
-    image: alexmarin88/proiect-cc:client
+    image: ioanamoraru14/proiect-cc:client
     hostname: client
     networks:
       - backend
@@ -102,7 +102,7 @@ services:
     links:
       - db
     ports:
-      - "5000:5000"
+      - "8000:8000"
     networks:
       - apigw
 

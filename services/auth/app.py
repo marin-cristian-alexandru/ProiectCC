@@ -50,7 +50,7 @@ def login():
 
     # if username != 'asd' or password != 'asd':
     #     return jsonify({"msg": "Bad username or password"}), 401
-    return jsonify(user.id), 200
+    # return jsonify(user.id), 200
 
     access_token = create_access_token(identity=username, expires_delta=False)
     return jsonify(access_token=access_token), 200
@@ -62,4 +62,4 @@ def protected():
     return jsonify(logged_in_as=current_user), 200
 
 if __name__ == '__main__':
-    app.run()
+    app.run(port=8000)

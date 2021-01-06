@@ -1,4 +1,4 @@
 requests
-flask
-Flask-JWT==0.3.2
-Flask-JWT-Extended==3.25.0
+Flask
+Flask-JWT
+Flask-JWT-Extended
