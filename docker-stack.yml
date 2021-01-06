@@ -103,6 +103,8 @@ services:
       - db
     networks:
       - apigw
+    depends_on:
+      - db
 
   db:
     container_name: db
