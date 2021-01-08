@@ -1,0 +1,128 @@
+version: '3.3'
+
+services:
+  influxdb:
+    image: influxdb:latest
+    volumes:
+        - db_data:/var/lib/influxdb
+    hostname: influxdb
+    networks:
+      - dbconnect
+      - front
+    environment:
+      INFLUX_ROOT_PASSWORD: proiectcc
+      INFLUX_DATABASE: TransfermarkT
+    deploy:
+      placement:
+        constraints:
+          - node.labels.influxdb == true
+    ports:
+      - "8086:8086"
+      
+  grafana:
+    image: grafana/grafana
+    depends_on:
+      - influxdb
+    hostname: grafana
+    networks:
+      - front
+    environment:
+      GRAFANA_DB_HOST: influxdb:8086
+      GRAFANA_USERNAME: alexmarin
+      GRAFANA_PASSWORD: proiectcc
+      GRAFANA_DB_NAME: grafana_db
+      GF_SECURITY_ADMIN_PASSWORD: proiectcc
+    ports:
+      - "3000:3000"
+    volumes:
+      - grf_data:/var/lib/grafana
+    deploy:
+      placement:
+        constraints:
+          - node.labels.grafana == true
+          
+  server:
+    build: ./services/server
+    hostname: server
+    networks:
+      - backend
+      - dbconnect
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    depends_on:
+      - influxdb
+                  
+  admin:
+    build: ./services/admin
+    hostname: admin
+    networks:
+      - dbconnect
+      - apigw
+    ports:
+      - "4444:4444"
+    depends_on:
+      - influxdb
+      - server
+    
+  client:
+    build: ./services/client
+    hostname: client
+    networks:
+      - backend
+      - apigw
+    ports:
+      - "7777:7777"
+    depends_on:
+      - server
+
+  auth:
+    build: ./services/auth
+    command: gunicorn app:app -b 0.0.0.0:8014 --reload
+    volumes:
+      - ./services/auth:/app
+    links:
+      - db
+    ports:
+      - "8014:8014"
+    networks:
+      - apigw
+
+  db:
+    container_name: db
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - ./database:/docker-entrypoint-initdb.d/:ro
+      - proiect-db:/var/lib/mysql
+    networks:
+      - database-admin
+      - apigw
+      - backend
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - 7000:80
+    links:
+      - db:db
+    environment:
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: root
+    networks:
+      - database-admin
+
+networks:
+  front:
+  backend:
+  dbconnect:
+  apigw:
+  database-admin:
+
+volumes:
+  db_data: {}
+  grf_data: {}
+  proiect-db:

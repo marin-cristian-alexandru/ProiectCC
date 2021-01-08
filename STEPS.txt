@@ -62,6 +62,17 @@ acestora se va adauga entry-pointul specific fiecaruia
 	eg. http://ip172-18-0-118-bvkr6t2b914g00a4ltc0-80.direct.labs.play-with-docker.com/admin/show_type?ttype=transfer_listed
 	
 
+Login
+
+Operatia posibila este cerere POST. La URL se pune linkul din spatele portului 80 (sau 443) expus de apigw kong, apoi /auth specific si apoi endpointul /login
+eg. http://ip172-18-0-6-bvr22036hnp0008qcbbg-80.direct.labs.play-with-docker.com/auth/login
+
+Pentru un body corect, in Postman se aleg Body, raw, JSON cu urmatorul text: 
+{
+    "username": "user",
+    "password": "user"
+}
+
 ALTE COMENZI DACA SE FACE DEPLOY PE LOCAL: 
 Build si run imagine custom (dockerfile)
 
