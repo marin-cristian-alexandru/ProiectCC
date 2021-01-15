@@ -79,15 +79,12 @@ services:
 
   auth:
     build: ./services/auth
-    command: gunicorn app:app -b 0.0.0.0:8014 --reload
-    volumes:
-      - ./services/auth:/app
-    links:
-      - db
     ports:
       - "8014:8014"
     networks:
       - apigw
+    depends_on: 
+      - db
 
   db:
     container_name: db
