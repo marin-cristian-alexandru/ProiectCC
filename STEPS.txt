@@ -26,6 +26,11 @@ docker node update --label-add grafana=true <id_nod_master>
 //add influxdb to swarm
 docker node update --label-add influxdb=true q1jto5em36mady0mfdbc98wkn
 
+Se creeaza secretele: pentru fiecare fisier din folderul secrets se ruleaza comanda
+$ docker secret create nume_secret nume_fisier
+
+Numele fisierelor sunt identice cu numele secretelor fara extensia .txt
+
 Se deployaza stack-ul !!!!nume obligatoriu tmkt (transfermaerket prescurtat)
 $ docker stack deploy -c docker-stack.yml tmkt
 
@@ -72,6 +77,14 @@ Pentru un body corect, in Postman se aleg Body, raw, JSON cu urmatorul text:
     "username": "user",
     "password": "user"
 }
+
+Pentru portainer:
+
+$ docker stack deploy -c stack-portainer.yml portainer
+
+Apoi portainerul este disponibil pe portul 9000
+user: admin
+parola: admin
 
 ALTE COMENZI DACA SE FACE DEPLOY PE LOCAL: 
 Build si run imagine custom (dockerfile)
