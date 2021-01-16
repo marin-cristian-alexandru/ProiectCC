@@ -26,8 +26,9 @@ docker node update --label-add grafana=true <id_nod_master>
 //add influxdb to swarm
 docker node update --label-add influxdb=true q1jto5em36mady0mfdbc98wkn
 
-Se creeaza secretele: pentru fiecare fisier din folderul secrets se ruleaza comanda
-$ docker secret create nume_secret nume_fisier
+Se creeaza secretele:
+-  pentru fiecare fisier din folderul secrets se ruleaza comanda
+$ docker secret create <nume_secret> <nume_secret>.txt
 
 Numele fisierelor sunt identice cu numele secretelor fara extensia .txt
 
@@ -66,7 +67,6 @@ acestora se va adauga entry-pointul specific fiecaruia
 	/delete_type?ttype=confirmed cu tipul de date care sa fie sters, /show_database si /drop_transfers
 	eg. http://ip172-18-0-118-bvkr6t2b914g00a4ltc0-80.direct.labs.play-with-docker.com/admin/show_type?ttype=transfer_listed
 	
-
 Login
 
 Operatia posibila este cerere POST. La URL se pune linkul din spatele portului 80 (sau 443) expus de apigw kong, apoi /auth specific si apoi endpointul /login
@@ -77,6 +77,7 @@ Pentru un body corect, in Postman se aleg Body, raw, JSON cu urmatorul text:
     "username": "user",
     "password": "user"
 }
+Tokenul primit ca raspuns se adauga pentru restul de requesturi in tabul authentification si se alege Bearer Token.
 
 Pentru portainer:
 
@@ -85,6 +86,24 @@ $ docker stack deploy -c stack-portainer.yml portainer
 Apoi portainerul este disponibil pe portul 9000
 user: admin
 parola: admin
+
+Pentru CI/CD:
+
+Pe master se dau comenzile: 
+$ mkdir ~/gitlab-runner/config
+$ docker run -d --name gitlab-runner --restart always \
+     -v ~/gitlab-runner/config:/etc/gitlab-runner \
+     -v /var/run/docker.sock:/var/run/docker.sock \
+     gitlab/gitlab-runner:latest
+$ docker run --rm -it -v ~/gitlab-runner/config:/etc/gitlab-runner gitlab/gitlab-runner register
+
+Imaginea de docker este docker:19.03
+
+Pentru a adauga un utilizator nou in baza de date pentru auth:
+- se acceseaza portul 7000
+- username: root
+  parola: root
+- se selecteaza tabela users si sus exista optiunea de insert
 
 ALTE COMENZI DACA SE FACE DEPLOY PE LOCAL: 
 Build si run imagine custom (dockerfile)
