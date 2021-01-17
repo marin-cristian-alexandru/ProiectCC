@@ -32,7 +32,10 @@ $ docker secret create <nume_secret> <nume_secret>.txt
 
 Numele fisierelor sunt identice cu numele secretelor fara extensia .txt
 
-Se deployaza stack-ul !!!!nume obligatoriu tmkt (transfermaerket prescurtat)
+Se deployaza stack-ul !!!!nume obligatoriu tmkt (transfermaerket prescurtat) : (versiunea finala cu secrete)
+$ docker stack deploy -c docker-stack-secrets.yml tmkt
+
+Pentru a se rula o versiune fara secrete:
 $ docker stack deploy -c docker-stack.yml tmkt
 
 Se verifica cu $docker service ls pana cand toate serviciile au cate o replica deployata si activa (1/1)
